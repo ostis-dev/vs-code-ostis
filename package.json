@@ -26,10 +26,16 @@
         "ostis", "knowledge base"
     ],
 
+    "activationEvents": [ 
+        "onLanguage:scs" 
+    ], 
+
+    "main": "./out/ostisMain", 
+
     "contributes": {
         "languages": [{
             "id": "scs",
-            "aliases": ["scs", "scs"],
+            "aliases": ["scs", "scsi"],
             "extensions": [".scs",".scsi"],
             "configuration": "./language-configuration.json"
         }],
@@ -41,12 +47,34 @@
         "snippets": [{
             "language": "scs",
             "path": "./snippets/scs.json"
-        }]
+        }],
+        "configurationDefaults": {
+			"[scs]": {
+				"editor.quickSuggestions": true,
+				"editor.tabSize": 4,
+				"editor.insertSpaces": true,
+				"editor.detectIndentation": true,
+				"editor.trimAutoWhitespace": true,
+				"editor.autoClosingBrackets": true
+			}
+        }
+    },
+
+    "configuration": {
+        "type": "object",
+        "title": "OSTIS extension configuration",
+        "properties": {
+            "scsLanguageServer.maxNumberOfProblems": {
+                "type": "number",
+                "default": 100,
+                "description": "Controls the maximum number of problems produced by the server."
+            }
+        }
     },
 
     "dependencies": {
-        "vscode-languageclient": "^2.6.3",
-        "vscode-languageserver": "^2.6.2"
+        "vscode-languageclient": "^3.2.0",
+        "vscode-languageserver": "^3.2.0"
     },
 
     "devDependencies": {
