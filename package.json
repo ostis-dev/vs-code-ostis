@@ -1,9 +1,17 @@
 {
-    "name": "scs",
-    "displayName": "scs",
-    "description": "Support of SCs-code edit",
-    "version": "0.0.1",
-    "publisher": "ostis",
+    "name": "ostis",
+    
+    "description": "Support of knowledge base source edit for OSTIS projects.",
+    "version": "0.1.0",
+    "publisher": "deniskoronchik",
+    "displayName": "OSTIS Knowledge base source support",
+    "license": "MIT",
+    "icon": "images/ostis-logo.png",
+
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ostis-dev/vs-code-ostis.git"
+    },
 
     "engines": {
         "vscode": "^1.10.0"
@@ -11,8 +19,11 @@
 
     "categories": [
         "Languages",
-        "Snippets",
-		"Themes"
+        "Snippets"
+    ],
+
+    "keywords": [
+        "ostis", "knowledge base"
     ],
 
     "contributes": {
