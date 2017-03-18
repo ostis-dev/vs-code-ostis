@@ -5,11 +5,6 @@
     "version": "0.0.1",
     "publisher": "ostis",
 
-    "activationEvents": [
-        "onLanguage:scs"
-    ],
-    "main": "./out/main",
-
     "engines": {
         "vscode": "^1.10.0"
     },
