@@ -2,7 +2,7 @@
 
 import { TextDocument } from 'vscode-languageserver';
 
-const spaces: string = ' \t\n\r":{[()]},';
+const spaces: string = ' \t\n\r":{[()]},;-=><';
 
 export function getCurrentPrefix(document: TextDocument, offset: number) {
 	let i = offset - 1;
@@ -24,5 +24,5 @@ export function getCurrentWord(document: TextDocument, offset: number) {
     while (j < text.length && spaces.indexOf(text.charAt(j)) === -1) {
         j++;
     }
-    return text.substring(i + 1, j - 1);
+    return text.substring(i + 1, j);
 }
