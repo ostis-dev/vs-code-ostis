@@ -1,5 +1,5 @@
 // append set of apples into fruit set
-sc_node#fruit | sc_edge_main#... | sc_node#apple;;
+sc_node#fruit | sc_edge_main#edge | sc_node#apple;;
 // append set of bananas into fruit set
 sc_node#fruit | sc_edge_main#... | sc_node#banana;;
 

@@ -26,7 +26,7 @@
 		"aliases": {
 			"patterns": [
 				{
-					"match": "(sc_node|sc_link|sc_edge_dcommon|sc_edge_ucommon|sc_edge_main|sc_edge_access)(#)(([.]{3})|([.]{0,2}\\w+))",
+					"match": "\\b(sc_node|sc_link|sc_edge_dcommon|sc_edge_ucommon|sc_edge_main|sc_edge_access)(#)(([.]{3})|([.]{0,2}\\w+))\\b",
 					"captures": {
 						"1": {
 							"name": "keyword.control.scs"
@@ -39,7 +39,10 @@
 						}
 					}
 				},
-
+				{
+					"match": "\\bsc_const|sc_var\\b",
+					"name": "storage.type.scs"
+				},
 				{
 					"match": "\\b(sc_node_(not_binary_tuple|struct|role_relation|norole_relation|(class|not_relation)|abstract|material))\\b",
 					"name": "storage.type.scs"
@@ -49,11 +52,11 @@
 					"name": "storage.type.scs"
 				},
 				{
-					"match": "\\b(sc_const|sc_var|sc_node|sc_link|sc_edge_dcommon|sc_edge_ucommon|sc_edge_main|sc_edge_access)\\b",
+					"match": "\\b(sc_node|sc_link|sc_edge_dcommon|sc_edge_ucommon|sc_edge_main|sc_edge_access)\\b",
 					"name": "keyword.control.scs"
 				},
 				{
-					"match": "\\s*([_]?[.]{0,2})?([a-zA-Z0-9_]+)\\s*",
+					"match": "\\b([_]?[.]{0,2})?([a-zA-Z0-9_]+)\\b",
 					"name": "variable.other.scs"
 				}
 			]

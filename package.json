@@ -1,55 +1,97 @@
 {
-    "name": "scs",
-    "displayName": "scs",
-    "description": "Support of SCs-code edit",
-    "version": "0.0.1",
-    "publisher": "ostis",
-
-    "engines": {
-        "vscode": "^1.10.0"
-    },
-
-    "categories": [
-        "Languages",
-        "Snippets",
-		"Themes"
+  "name": "ostis",
+  "description": "Support of knowledge base source edit for OSTIS projects.",
+  "version": "0.2.0",
+  "publisher": "deniskoronchik",
+  "displayName": "OSTIS Knowledge base source support",
+  "license": "MIT",
+  "icon": "images/ostis-logo.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ostis-dev/vs-code-ostis.git"
+  },
+  "engines": {
+    "vscode": "^1.10.0"
+  },
+  "categories": [
+    "Languages",
+    "Snippets"
+  ],
+  "keywords": [
+    "ostis",
+    "knowledge base"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./out/ostisMain",
+  "contributes": {
+    "languages": [
+      {
+        "id": "scs",
+        "aliases": [
+          "scs",
+          "scsi"
+        ],
+        "extensions": [
+          ".scs",
+          ".scsi"
+        ],
+        "configuration": "./language-configuration.json"
+      }
     ],
-
-    "contributes": {
-        "languages": [{
-            "id": "scs",
-            "aliases": ["scs", "scs"],
-            "extensions": [".scs",".scsi"],
-            "configuration": "./language-configuration.json"
-        }],
-        "grammars": [{
-            "language": "scs",
-            "scopeName": "source.scs",
-            "path": "./syntaxes/scs.tmLanguage.json"
-        }],
-        "snippets": [{
-            "language": "scs",
-            "path": "./snippets/scs.json"
-        }]
-    },
-
-    "dependencies": {
-        "vscode-languageclient": "^2.6.3",
-        "vscode-languageserver": "^2.6.2"
-    },
-
-    "devDependencies": {
-       "typescript": "^2.0.3",
-        "vscode": "^1.1.0",
-        "mocha": "^2.3.3",
-        "@types/node": "^6.0.40",
-        "@types/mocha": "^2.2.32"
-   },
-
-   "scripts": {
-        "vscode:prepublish": "tsc -p ./",
-        "compile": "tsc -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "node ./node_modules/vscode/bin/test"
+    "grammars": [
+      {
+        "language": "scs",
+        "scopeName": "source.scs",
+        "path": "./syntaxes/scs.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "scs",
+        "path": "./snippets/scs.json"
+      }
+    ],
+    "configurationDefaults": {
+      "[scs]": {
+        "editor.quickSuggestions": true,
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true,
+        "editor.detectIndentation": true,
+        "editor.trimAutoWhitespace": true,
+        "editor.autoClosingBrackets": true
+      }
     }
+  },
+  "configuration": {
+    "type": "object",
+    "title": "OSTIS extension configuration",
+    "properties": {
+      "scsLanguageServer.maxNumberOfProblems": {
+        "type": "number",
+        "default": 100,
+        "description": "Controls the maximum number of problems produced by the server."
+      }
+    }
+  },
+  "dependencies": {
+    "pegjs": "^0.10.0",
+    "vscode-languageclient": "^3.2.0",
+    "vscode-languageserver": "^3.2.0"
+  },
+  "devDependencies": {
+    "@types/mocha": "^2.2.32",
+    "@types/node": "^6.0.40",
+    "cpx": "^1.5.0",
+    "mocha": "^2.3.3",
+    "typescript": "^2.0.3",
+    "vscode": "^1.1.0"
+  },
+  "scripts": {
+    "vscode:prepublish": "tsc -p ./",
+    "compile": "pegjs -o src/scs/scsSyntax.js src/scs/syntax/scsSyntax.pegjs && cpx \"src/**/*.js\" out && tsc -watch -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "test": "node ./node_modules/vscode/bin/test"
+  }
 }
