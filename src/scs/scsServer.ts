@@ -7,7 +7,8 @@ import {
 	InitializeParams, InitializeResult,
     TextDocumentPositionParams, CompletionItem,
     Hover, DidChangeTextDocumentParams,
-    WorkspaceSymbolParams, SymbolInformation
+    WorkspaceSymbolParams, SymbolInformation,
+    TextDocumentSyncKind
 } from 'vscode-languageserver';
 
 import { SCsHoverProvider } from './scsHovers';
@@ -34,11 +35,12 @@ class CoreContext {
     parsedData: SCsParsedData;
 
     constructor() {
-        this.hoverProvider = new SCsHoverProvider();
-        this.completionProvider = new SCsCompletionItemProvider();
 
-        this.parsedData = new SCsParsedData();
+        this.parsedData = new SCsParsedData(connection.console);
         this.parsedData.sendDiagnostic = connection.sendDiagnostics;
+
+        this.hoverProvider = new SCsHoverProvider();
+        this.completionProvider = new SCsCompletionItemProvider(this.parsedData);
     }
 };
 
@@ -47,7 +49,6 @@ let workspaceRoot: string;
 
 function parseAllOpenedDocuments() {
     documents.all().forEach((doc: TextDocument, index: number, array: TextDocument[]) => {
-        connection.console.log("Parse " + doc.uri);
         coreCtx.parsedData.parseDocument(doc.getText(), doc.uri);
     });
 }
@@ -55,12 +56,10 @@ function parseAllOpenedDocuments() {
 function parseDocumentsInFolder(path: string) {
     connection.console.log("Parse files in: " + path);
     
-    let files: string[] = getFilesInDirectory(path, ['scs', 'scsi']);
+    let files: string[] = getFilesInDirectory(path, ['.scs', '.scsi']);
     files.forEach((filePath: string) => {
         const content: string = getFileContent(filePath).toString();
         coreCtx.parsedData.parseDocument(content, filePath);
-
-        connection.console.log(filePath + ": " + coreCtx.parsedData.errors[filePath].length);
     });
     
 }
@@ -70,20 +69,20 @@ connection.onInitialize((params): InitializeResult => {
     workspaceRoot = params.rootPath;
     coreCtx = new CoreContext();
 
+    if (workspaceRoot)
+        parseDocumentsInFolder(workspaceRoot);
+
 	return {
 		capabilities: {
-			// Tell the client that the server works in FULL text document sync mode
-			textDocumentSync: documents.syncKind,
+			textDocumentSync: TextDocumentSyncKind.Full,
             hoverProvider: true,
             completionProvider: { resolveProvider: true },
-            workspaceSymbolProvider: true 
+            workspaceSymbolProvider: true
             }
 		}
 });
 
 connection.onDidChangeConfiguration((params) => {
-    connection.console.log("Configuration changed");
-
     parseAllOpenedDocuments();
 });
 
@@ -112,7 +111,6 @@ connection.onCompletionResolve((item: CompletionItem) : CompletionItem => {
 });
 
 documents.onDidChangeContent((event) => {
-    connection.console.log("Content changed: " + event.document.uri);
     coreCtx.parsedData.parseDocument(event.document.getText(), event.document.uri);
 });
 

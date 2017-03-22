@@ -6,6 +6,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [0.2.0] - Current
 - Implement hover events
 - Implement diagnostic issues
+- Implement autocompletion
 
 ## [0.1.0]
 - Implement syntax highlight for SCs

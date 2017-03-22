@@ -31,7 +31,6 @@ export function getCurrentWord(document: TextDocument, offset: number) {
     return text.substring(i + 1, j);
 }
 
-
 // ----------------------------------------------
 function listFilesRecursive(dirPath: string, ext: string[]) : string[] {
 	let statInfo = FileSystem.statSync(dirPath);
@@ -44,8 +43,9 @@ function listFilesRecursive(dirPath: string, ext: string[]) : string[] {
 			let childPath = Path.normalize(Path.join(dirPath, files[i]));
 			let childInfo = FileSystem.statSync(childPath);
 
-			if (childInfo.isFile() && ext.indexOf(Path.extname(childPath)) !== -1) {
-				result.push(childPath);
+			if (childInfo.isFile()) {
+				if (ext.indexOf(Path.extname(childPath)) > -1)
+					result.push(childPath);
 			} else {
 				result = result.concat(listFilesRecursive(childPath, ext));
 			}
