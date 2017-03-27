@@ -1,7 +1,7 @@
 {
   "name": "ostis",
   "description": "Support of knowledge base source edit for OSTIS projects.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "publisher": "deniskoronchik",
   "displayName": "OSTIS Knowledge base source support",
   "license": "MIT",

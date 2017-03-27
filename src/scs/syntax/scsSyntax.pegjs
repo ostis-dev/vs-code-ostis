@@ -43,7 +43,7 @@ idtf_edge "edge"
 	  ')'
 	
 idtf_set "set"
-	= '{' attr_list? idtf_common (';' attr_list? idtf_common)* '}'
+	= '{' _ attr_list? _ idtf_common (';' _ attr_list? _ idtf_common)* _ '}'
 
 idtf_common
 	= idtf_system
@@ -56,7 +56,7 @@ idtf_list
 	= _ idtf_common _ internal_sentence_list? (_ ';' _ idtf_common _ internal_sentence_list?)*
 
 internal_sentence "internal sentence"
-	= _ connector _ attr_list? idtf_list
+	= _ connector _ attr_list? _ idtf_list
 
 internal_sentence_list
 	= '(*' _ (internal_sentence ';;')+ _ '*)'
