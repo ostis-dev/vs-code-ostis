@@ -7,7 +7,6 @@ import { getCurrentWord } from './scsUtils';
 
 export class SCsHoverProvider
 {
-
     public provide(document: vs.TextDocument,
                    position: vs.Position) : vs.Hover
     {

@@ -3,9 +3,32 @@
 import * as vs from 'vscode-languageserver';
 import { getCurrentPrefix } from './scsUtils';
 import { scsKeywords, scsDetails } from './scsData';
+import { SCsParsedData } from './scsParsedData';
+
+enum CompletionItemType {
+    Keyword,
+
+};
 
 export class SCsCompletionItemProvider
 {
+    private parsedData: SCsParsedData;
+
+    constructor(inParsedData: SCsParsedData) {
+        this.parsedData = inParsedData;
+    }
+
+    protected isKeyword(symbol: string) : boolean {
+        for (let i = 0; i < scsKeywords.length; ++i) {
+            const item = scsKeywords[i];
+
+            if (item.values.indexOf(symbol) > -1)
+                return true;
+        }
+
+        return false;
+    }
+
     protected getToken(document: vs.TextDocument,
                        position: vs.Position) : string
     {
@@ -20,6 +43,7 @@ export class SCsCompletionItemProvider
         let currentWord: string = this.getToken(document, position);
 
         this.provideKeywords(currentWord, suggestions);
+        this.provideSymbols(this.parsedData.provideAutoComplete(document.uri, currentWord), suggestions);
 
         return suggestions;
     }
@@ -27,11 +51,21 @@ export class SCsCompletionItemProvider
     public resolve(item: vs.CompletionItem) : vs.CompletionItem
     {
         let detail = scsDetails[item.label];
-        if (detail)
+        if (detail) {
             item.detail = detail;
+        }
 
         // TODO: item.documentaion
         return item;
+    }
+
+    private provideSymbols(symbols: string[],
+                           items: vs.CompletionItem[])
+    {
+        symbols.forEach((s: string) => {
+            if (!this.isKeyword(s))
+                items.push(vs.CompletionItem.create(s));
+        });
     }
 
     private provideKeywords(prefix: string,
@@ -43,7 +77,9 @@ export class SCsCompletionItemProvider
         scsKeywords.forEach(key => {
             key.values.forEach(v => {
                 if (v.startsWith(prefix)) {
-                    items.push(vs.CompletionItem.create(v));
+                    let d = vs.CompletionItem.create(v);
+                    d.kind = key.type;
+                    items.push(d);
                 }
             });
         });

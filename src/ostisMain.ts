@@ -34,13 +34,13 @@ export function activate(context: ExtensionContext) {
 		run : { module: serverModule, transport: TransportKind.ipc },
 		debug: { module: serverModule, transport: TransportKind.ipc, options: debugOptions }
 	}
-	
+
 	// Options to control the language client
 	let clientOptions: LanguageClientOptions = {
 		// Register the server for plain text documents
 		documentSelector: ['scs', 'scsi'],
 		synchronize: {
-			// Synchronize the setting section 'languageServerExample' to the server
+			// Synchronize the setting section 'scsLanguageServer' to the server
 			configurationSection: 'scsLanguageServer',
 			// Notify the server about file changes to '.clientrc files contain in the workspace
 			fileEvents: workspace.createFileSystemWatcher('**/.clientrc')
@@ -48,7 +48,8 @@ export function activate(context: ExtensionContext) {
 	}
 	
 	// Create the language client and start the client.
-	let disposable = new LanguageClient('scsLanguageServer', 'SCs language Server', serverOptions, clientOptions).start();
+	let client = new LanguageClient('scsLanguageServer', 'SCs language Server', serverOptions, clientOptions);
+	let disposable = client.start();
 	
 	// Push the disposable to the context's subscriptions so that the 
 	// client can be deactivated on extension deactivation
