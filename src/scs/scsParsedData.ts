@@ -1,6 +1,8 @@
 'use strict';
 
-import { PublishDiagnosticsParams, Range, Diagnostic } from 'vscode-languageserver';
+import * as vs from 'vscode-languageserver';
+
+import { makeUri } from './scsUtils';
 
 const scsParser = require('./scsSyntax');
 
@@ -37,10 +39,16 @@ function getSymbolRange(location) : SymbolRange {
     };
 }
 
+function toRange(range: SymbolRange): vs.Range {
+    const begPos: vs.Position = vs.Position.create(range.start.line - 1, range.start.column - 1);
+    const endPos: vs.Position = vs.Position.create(range.end.line - 1, range.end.column - 1);
+    return vs.Range.create(begPos, endPos);
+}
+
 class FileInfo
 {
     private uri: string;             // uri of a file
-    private errors: Diagnostic[];    // list of all errors is a file
+    private errors: vs.Diagnostic[];    // list of all errors is a file
     private symbols: Map<string, SymbolRange[]>;       // map of all symbol occurenses
 
     constructor(docUri: string) {
@@ -50,9 +58,9 @@ class FileInfo
     }
 
     public appendError(err) : void {
-        let range = Range.create(err.location.start.line - 1, err.location.start.column - 1,
+        let range = vs.Range.create(err.location.start.line - 1, err.location.start.column - 1,
                                  err.location.end.line - 1, err.location.end.column - 1);
-        let diagnostic = Diagnostic.create(range, err.toString());
+        let diagnostic = vs.Diagnostic.create(range, err.toString());
 
         this.errors.push(diagnostic);
     }
@@ -64,11 +72,17 @@ class FileInfo
     }
 
     public appendSymbol(name: string, location: SymbolRange) {
-        if (!this.symbols.has(name)) {
-            this.symbols.set(name, [location]);
+        const list = this.symbols.get(name);
+        if (list) {
+            const found = list.find((value: SymbolRange) : boolean => {
+                return (isSymbolRangeEqual(location, value));
+            });
+
+            if (!found)
+                list.push(location);
         } else {
-            this.symbols.get(name).push(location);
-        }
+            this.symbols.set(name, [location]);
+        } 
     }
 
     public provideComplete(prefix: string, docUri: string) : string[] {
@@ -89,8 +103,12 @@ class FileInfo
         return this.symbols.size;
     }
 
-    public getErrors() : Diagnostic[] {
+    public getErrors() : vs.Diagnostic[] {
         return this.errors;
+    }
+
+    public getSymbolRanges(name: string) : SymbolRange[] {
+        return this.symbols.get(name);
     }
 };
 
@@ -105,17 +123,19 @@ export class SCsParsedData
     }
 
     // send diagnostic callback
-    public sendDiagnostic: (params: PublishDiagnosticsParams) => void;
+    public sendDiagnostic: (params: vs.PublishDiagnosticsParams) => void;
 
-    private doSendDiagnostic(params: PublishDiagnosticsParams): void {
+    private doSendDiagnostic(params: vs.PublishDiagnosticsParams): void {
         if (this.sendDiagnostic)
             this.sendDiagnostic(params);
     }
 
     public parseDocument(docText: string, docUri: string) {
+        
+        docUri = makeUri(docUri);
         let finfo = new FileInfo(docUri);
         this.files.set(docUri, finfo);
-                  
+
         try {
             scsParser.parse(docText, {
                 docUri: docUri,
@@ -126,13 +146,13 @@ export class SCsParsedData
             {
                 finfo.appendError(e);
             } else {
-                this.console.log(e.message);
+                this.console.log(e.stack);
             }
         }
 
         // send diagnostic
         if (this.sendDiagnostic) {
-            let resultErrors: Diagnostic[] = [];
+            let resultErrors: vs.Diagnostic[] = [];
 
             if (finfo) {
                 resultErrors = finfo.getErrors();
@@ -160,11 +180,63 @@ export class SCsParsedData
         return uniqueResult;
     }
 
+    public provideWorkspaceSymbolUsage(query: string) : vs.SymbolInformation[] {
+        let result: vs.SymbolInformation[] = [];
+
+        this.files.forEach((value: FileInfo, key) => {
+            const ranges = value.getSymbolRanges(query);
+
+            if (ranges) {
+                ranges.forEach((r: SymbolRange) => {
+                    const sym:vs.SymbolInformation  = vs.SymbolInformation.create(key,
+                        vs.SymbolKind.Variable, toRange(r));
+                });
+            }
+        });
+
+        return result;
+    }
+
+    public provideReferencesInFile(query: string, uri: string) : vs.Location[] {
+        const result: vs.Location[] = [];
+
+        const fileInfo: FileInfo = this.files.get(uri);
+        if (fileInfo) {
+            const ranges: SymbolRange[] = fileInfo.getSymbolRanges(query);
+
+            if (ranges) {
+                ranges.forEach((r: SymbolRange) => {
+                    result.push(vs.Location.create(uri, toRange(r)));
+                });
+            }
+        }
+
+        return result;
+    }
+
+    public provideReferences(query: string) : vs.Location[] {
+        let result: vs.Location[] = [];
+        this.files.forEach((value: FileInfo, key: string) => {
+            const ranges: SymbolRange[] = value.getSymbolRanges(query);
+
+            if (ranges) {
+                ranges.forEach((r: SymbolRange) => {
+                    result.push(vs.Location.create(key, toRange(r)));
+                });
+            }
+        });
+
+        return result;
+    }
+
     public _onAppendSymbol(docUri: string, name:string, location) : void {
+        // correct location
+
         name = name.trim();
         const finfo = this.files.get(docUri);
 
-        if (!finfo) return; // we need to work safe
+        if (!finfo)
+            return; // we need to work safe
 
         // append symbol
         finfo.appendSymbol(name, getSymbolRange(location));

@@ -28,7 +28,14 @@ export function getCurrentWord(document: TextDocument, offset: number) {
     while (j < text.length && spaces.indexOf(text.charAt(j)) === -1) {
         j++;
     }
-    return text.substring(i + 1, j);
+    return text.substring(i + 1, j).trim();
+}
+
+export function makeUri(path: string) {
+	if (path.startsWith('file:'))
+		return path;
+	// TODO: more improvements
+	return 'file://' + path;
 }
 
 // ----------------------------------------------
@@ -63,4 +70,8 @@ export function getFilesInDirectory(dirPath: string, ext: string[]) : string[] {
 
 export function getFileContent(filePath: string) : string {
 	return FileSystem.readFileSync(filePath);
+}
+
+export function normalizeFilePath(filePath: string) : string {
+	return filePath.replace('file://', "");
 }
