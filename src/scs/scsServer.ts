@@ -1,55 +1,26 @@
 'use strict';
 
-import {
-    IPCMessageReader, IPCMessageWriter,
-	createConnection, IConnection,
-	TextDocuments, TextDocument, Diagnostic, DiagnosticSeverity, 
-	InitializeParams, InitializeResult,
-    TextDocumentPositionParams, CompletionItem,
-    Hover, DidChangeTextDocumentParams,
-    WorkspaceSymbolParams, SymbolInformation,
-    TextDocumentSyncKind
-} from 'vscode-languageserver';
+import * as vs from 'vscode-languageserver';
 
-import { SCsHoverProvider } from './scsHovers';
-import { SCsCompletionItemProvider } from './scsCompletion';
-import { SCsParsedData } from './scsParsedData';
-import { getFilesInDirectory, getFileContent } from './scsUtils';
+import { SCsSession } from './scsSession';
+import { getFilesInDirectory, getFileContent, normalizeFilePath } from './scsUtils';
 
 // Create a connection for the server. The connection uses Node's IPC as a transport
-let connection: IConnection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
+let connection: vs.IConnection = vs.createConnection(new vs.IPCMessageReader(process), new vs.IPCMessageWriter(process));
 
 // Create a simple text document manager. The text document manager
 // supports full document sync only
-let documents: TextDocuments = new TextDocuments();
+let documents: vs.TextDocuments = new vs.TextDocuments();
 // Make the text document manager listen on the connection
 // for open, change and close text document events
 documents.listen(connection);
 
-// After the server has started the client sends an initialize request. The server receives
-// in the passed params the rootPath of the workspace plus the client capabilities. 
-class CoreContext {
-    hoverProvider: SCsHoverProvider;
-    completionProvider: SCsCompletionItemProvider;
-
-    parsedData: SCsParsedData;
-
-    constructor() {
-
-        this.parsedData = new SCsParsedData(connection.console);
-        this.parsedData.sendDiagnostic = connection.sendDiagnostics;
-
-        this.hoverProvider = new SCsHoverProvider();
-        this.completionProvider = new SCsCompletionItemProvider(this.parsedData);
-    }
-};
-
-let coreCtx: CoreContext;
+const  session: SCsSession = new SCsSession(connection, documents);
 let workspaceRoot: string;
 
 function parseAllOpenedDocuments() {
-    documents.all().forEach((doc: TextDocument, index: number, array: TextDocument[]) => {
-        coreCtx.parsedData.parseDocument(doc.getText(), doc.uri);
+    documents.all().forEach((doc: vs.TextDocument, index: number, array: vs.TextDocument[]) => {
+        session.parsedData.parseDocument(doc.getText(), doc.uri);
     });
 }
 
@@ -59,25 +30,27 @@ function parseDocumentsInFolder(path: string) {
     let files: string[] = getFilesInDirectory(path, ['.scs', '.scsi']);
     files.forEach((filePath: string) => {
         const content: string = getFileContent(filePath).toString();
-        coreCtx.parsedData.parseDocument(content, filePath);
+        session.parsedData.parseDocument(content, filePath);
     });
     
 }
 
-connection.onInitialize((params): InitializeResult => {
+connection.onInitialize((params): vs.InitializeResult => {
 	
     workspaceRoot = params.rootPath;
-    coreCtx = new CoreContext();
 
     if (workspaceRoot)
         parseDocumentsInFolder(workspaceRoot);
 
 	return {
 		capabilities: {
-			textDocumentSync: TextDocumentSyncKind.Full,
+			textDocumentSync: vs.TextDocumentSyncKind.Full,
             hoverProvider: true,
             completionProvider: { resolveProvider: true },
-            workspaceSymbolProvider: true
+            //workspaceSymbolProvider: true,
+            documentHighlightProvider: true,
+            referencesProvider: true,
+            renameProvider: true
             }
 		}
 });
@@ -92,26 +65,16 @@ connection.onDidChangeWatchedFiles(() => {
     parseAllOpenedDocuments();
 });
 
-connection.onHover((params: TextDocumentPositionParams) : Hover => {
-    let doc: TextDocument = documents.get(params.textDocument.uri);
-    return coreCtx.hoverProvider.provide(doc, params.position);
-});
-
-connection.onWorkspaceSymbol((params: WorkspaceSymbolParams) : SymbolInformation[] => {
-    return null;
-});
-
-connection.onCompletion((params: TextDocumentPositionParams) : CompletionItem[] => {
-    let doc: TextDocument = documents.get(params.textDocument.uri);
-    return coreCtx.completionProvider.provide(doc, params.position);
-});
-
-connection.onCompletionResolve((item: CompletionItem) : CompletionItem => {
-    return coreCtx.completionProvider.resolve(item);
-});
+connection.onWorkspaceSymbol(session.onWorkspaceSymbol());
+connection.onHover(session.onHover());
+connection.onReferences(session.onReferences());
+connection.onCompletion(session.onCompletion());
+connection.onCompletionResolve(session.onCompletionResolve());
+connection.onDocumentHighlight(session.onDocumentHighlight());
+connection.onRenameRequest(session.onRename());
 
 documents.onDidChangeContent((event) => {
-    coreCtx.parsedData.parseDocument(event.document.getText(), event.document.uri);
+    session.parsedData.parseDocument(event.document.getText(), normalizeFilePath(event.document.uri));
 });
 
 // Listen on the connection

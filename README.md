@@ -1,13 +1,35 @@
 ## Features
 
-Support of scs language:
-* syntax highlight
-* hover events documentation
+### Syntax highlight
+![Syntax highlighting](images/syntax-1.png)
+
+### Snippets
+![intelliSense](images/snippets.gif)
+
+### Autocompletion
+![Autocomplete](images/autocomplete.gif)
+
+### Hover events documentation
+![Hover](images/hover.gif)
+
+### Renaming
+![Rename](images/rename.gif)
+
+### Find all references
+![References](images/references.gif)
+
+### Diagnostic
+![Diagnostic](images/diagnostic.gif)
 
 ## Release Notes
 
-### [0.2.1] - In development
+## [0.3.0] - Current
+- Support of rename
+- Support find all references
+
+## [0.2.1]
 - Fix issue #3
+- Some improvements
 
 ### [0.2.0]
 - Implement hover events

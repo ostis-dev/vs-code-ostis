@@ -15,7 +15,7 @@ sentence
     / sentence_assign
 
 sentence_assign
-    = ID_SYSTEM _ '=' _ idtf_common
+    = _ ID_SYSTEM _ '=' _ idtf_common
     
 idtf_lvl1_preffix
 	= 'sc_node'
@@ -37,9 +37,9 @@ idtf_system
     / '...'
 
 idtf_edge "edge"
-	= '(' idtf_system
-	      connector attr_list?
-	      idtf_system
+	= '(' _ idtf_system _
+	      _ connector attr_list? _
+	      _ idtf_system _
 	  ')'
 	
 idtf_set "set"
@@ -94,7 +94,7 @@ connector "connector"
 
 // ------------------------------------------------
 ID_SYSTEM "system identifier"
-    = _ ([.]+)? ([_]?) [a-zA-Z0-9_]+ _ 
+    = ([.]+)? ([_]?) [a-zA-Z0-9_]+
     { 
         var value = { text: text(), location: location() };
         options.parsedData._onAppendSymbol(options.docUri, value.text, value.location);
