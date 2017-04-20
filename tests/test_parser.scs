@@ -24,3 +24,11 @@ facebook
 /* block comment
  o -> b;;
  */
+
+ x -> ...
+    (*
+        -> begin: y 
+        (*
+            <- end: t: h;;
+        *);;
+    *);;
