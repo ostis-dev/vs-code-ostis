@@ -3,11 +3,10 @@
 }
 
 syntax 
-    = (_ sentence_comment _)*
+    = (_ sentence_wrap _)*
 
-sentence_comment
- 	= COMMENT
-    / (sentence ';;')
+sentence_wrap
+ 	= (sentence ';;')
 
 sentence
     = sentence_lvl1 { return "sentence_lvl1"; }
@@ -56,19 +55,19 @@ idtf_list
 	= _ idtf_common _ internal_sentence_list? (_ ';' _ idtf_common _ internal_sentence_list?)*
 
 internal_sentence "internal sentence"
-	= _ connector _ attr_list? _ idtf_list
+	= _ connector _ attr_list? _ idtf_list _
 
 internal_sentence_list
-	= '(*' _ (internal_sentence ';;')+ _ '*)'
+	= _ '(*' _ (internal_sentence ';;')+ _ '*)' _
 
 sentence_lvl1
  	= idtf_lvl1 _ '|' _ idtf_lvl1 _ '|' _ idtf_lvl1
 
 sentence_lvl_common
-    = idtf_common _ connector _ attr_list? _ idtf_list (';' _ connector _ attr_list? idtf_list)*
+    = _ idtf_common _ connector _ attr_list? _ idtf_list _ (';' _ connector _ attr_list? idtf_list)*
 
 attr_list "attributes list"
-    = (ID_SYSTEM _ EDGE_ATTR)+
+    = (_ ID_SYSTEM _ EDGE_ATTR _)+
 
 connector "connector"
     = ('<>' /
@@ -106,15 +105,35 @@ EDGE_ATTR "edge attribute modifier"
         ':' / '::'
       )
 
-COMMENT "comments"
-    = ('//' ([^\n])*) { return "comment"; }
-    / ("/*" (!"*/" .)* "*/")
-
 LINK "link to file"
     = '"' (!'"' .)* '"'
 
 CONTENT "content"
     = '[' [^\]]* ']'
 
-_ "whitespace"
-    = [ \t\r\n]*
+// COMMENT "comments"
+//     = ('//' ([^\n])*) { return "comment"; }
+//     / ("/*" (!"*/" .)* "*/")
+
+// whiteSpace
+//     = [ \t\r\n]*
+
+_
+    = ( whiteSpace / lineTerminator / enclosedComment / lineComment )*
+
+
+whiteSpace
+    = [\t\v\f \u00A0\uFEFF]
+
+lineTerminator
+    = [\n\r]
+
+enclosedComment
+    = "/*" (!"*/" anyCharacter)* "*/"
+
+lineComment
+    = "//" (!lineTerminator anyCharacter)*
+
+anyCharacter
+    = . 
+

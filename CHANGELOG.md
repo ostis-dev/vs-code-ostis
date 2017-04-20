@@ -3,7 +3,10 @@ All notable changes to the "scs" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [0.3.0] - Current
+## [0.3.1] - Current
+- Fix issue #11 (comments and multiply attributes)
+
+## [0.3.0]
 - Support of rename
 - Support find all references
 
