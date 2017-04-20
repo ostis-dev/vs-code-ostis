@@ -2,7 +2,7 @@
   "name": "ostis",
   "description": "Support of knowledge base source edit for OSTIS projects.",
   "version": "0.3.1",
-  "publisher": "Denis Koronchik",
+  "publisher": "deniskoronchik",
   "displayName": "OSTIS Knowledge base source support",
   "license": "MIT",
   "icon": "images/ostis-logo.png",
