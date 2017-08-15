@@ -5,6 +5,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [0.3.1] - Current
 - Fix issue #11 (comments and multiply attributes)
+- Add contours support
 
 ## [0.3.0]
 - Support of rename

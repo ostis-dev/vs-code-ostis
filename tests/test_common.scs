@@ -1,10 +1,13 @@
 sc_type_node -> .node1;;
 ..node -> node2;;
 
+auto -> [test content];;
+
 fix -> [*
 	begin -> test;;
 	end -> [test content];;
 *];;
+
 
 /* Comment */
 vars = {

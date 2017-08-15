@@ -48,6 +48,7 @@ idtf_common
 	= idtf_system
 	/ idtf_edge
 	/ idtf_set
+    / CONTOUR
 	/ CONTENT
 	/ LINK
 
@@ -101,23 +102,17 @@ ID_SYSTEM "system identifier"
     }
 
 EDGE_ATTR "edge attribute modifier"
-    = (
-        ':' / '::'
-      )
+    = '::'
+    / ':'
 
 LINK "link to file"
     = '"' (!'"' .)* '"'
 
+CONTOUR "contour"
+	= '[*' syntax '*]'
+    
 CONTENT "content"
-    = '[' [^\]]* ']'
-
-// COMMENT "comments"
-//     = ('//' ([^\n])*) { return "comment"; }
-//     / ("/*" (!"*/" .)* "*/")
-
-// whiteSpace
-//     = [ \t\r\n]*
-
+    = '['[^\*] [^\]]* ']'
 _
     = ( whiteSpace / lineTerminator / enclosedComment / lineComment )*
 
