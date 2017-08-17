@@ -2,5 +2,11 @@
 /out
 
 /src/scs/scsSyntax.js
+/src/scs/syntax/*.js
+/src/scs/syntax/*.tokens
+/src/scs/syntax/\.antlr/
 
 *.vsix
+*.log
+
+
