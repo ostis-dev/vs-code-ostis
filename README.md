@@ -23,8 +23,13 @@
 
 ## Release Notes
 
-## [0.3.1] - Current
+## [0.3.2] - Current
+- Some improvements in erros providing
+- New syntax parsing engine
+
+## [0.3.1]
 - Fix issue #11 (comments and multiply attributes)
+- Add contours support
 
 ## [0.3.0]
 - Support of rename
