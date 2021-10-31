@@ -78,3 +78,4 @@ facebook
 		[facebook] (* <- lang_en;; *);
 	=> nrel_main_idtf:
 		[фейсбук] (* <- lang_ru;; *);;
+

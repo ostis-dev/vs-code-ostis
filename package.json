@@ -1,100 +1,94 @@
 {
-  "name": "ostis",
-  "description": "Support of knowledge base source edit for OSTIS projects.",
-  "version": "0.3.2",
-  "publisher": "deniskoronchik",
-  "displayName": "OSTIS Knowledge base source support",
-  "license": "MIT",
-  "icon": "images/ostis-logo.png",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/ostis-dev/vs-code-ostis.git"
-  },
-  "engines": {
-    "vscode": "^1.10.0"
-  },
-  "categories": [
-    "Languages",
-    "Snippets"
-  ],
-  "keywords": [
-    "ostis",
-    "knowledge base"
-  ],
-  "activationEvents": [
-    "*"
-  ],
-  "main": "./out/ostisMain",
-  "contributes": {
-    "languages": [
-      {
-        "id": "scs",
-        "aliases": [
-          "scs",
-          "scsi"
+    "name": "ostis",
+    "description": "Support of knowledge base source edit for OSTIS projects.",
+    "version": "0.3.2",
+    "publisher": "deniskoronchik",
+    "displayName": "OSTIS Knowledge base source support",
+    "license": "MIT",
+    "icon": "images/ostis-logo.png",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ostis-dev/vs-code-ostis.git"
+    },
+    "categories": [
+        "Programming Languages",
+        "Snippets"
+    ],
+    "keywords": [
+        "ostis",
+        "knowledge base"
+    ],
+    "engines": {
+        "vscode": "^1.43.0"
+    },
+    "activationEvents": [
+        "onLanguage:scs"
+    ],
+    "main": "./client/out/extension",
+    "contributes": {
+        "languages": [
+            {
+                "id": "scs",
+                "aliases": [
+                    "scs"
+                ],
+                "extensions": [
+                    ".scs"
+                ],
+                "configuration": "./language-configuration.json"
+            }
         ],
-        "extensions": [
-          ".scs",
-          ".scsi"
+        "grammars": [
+            {
+                "language": "scs",
+                "scopeName": "source.scs",
+                "path": "./syntaxes/scs.tmLanguage.json"
+            }
         ],
-        "configuration": "./language-configuration.json"
-      }
-    ],
-    "grammars": [
-      {
-        "language": "scs",
-        "scopeName": "source.scs",
-        "path": "./syntaxes/scs.tmLanguage.json"
-      }
-    ],
-    "snippets": [
-      {
-        "language": "scs",
-        "path": "./snippets/scs.json"
-      }
-    ],
-    "configurationDefaults": {
-      "[scs]": {
-        "editor.quickSuggestions": true,
-        "editor.tabSize": 4,
-        "editor.insertSpaces": true,
-        "editor.detectIndentation": true,
-        "editor.trimAutoWhitespace": true,
-        "editor.autoClosingBrackets": true
-      }
+        "snippets": [
+            {
+                "language": "scs",
+                "path": "./snippets/scs.json"
+            }
+        ],
+        "configurationDefaults": {
+            "[scs]": {
+                "editor.quickSuggestions": true,
+                "editor.tabSize": 4,
+                "editor.insertSpaces": true,
+                "editor.detectIndentation": true,
+                "editor.trimAutoWhitespace": true,
+                "editor.autoClosingBrackets": "always"
+            }
+        }
+    },
+    "configuration": {
+        "type": "object",
+        "title": "OSTIS extension configuration",
+        "properties": {
+            "scsLanguageServer.maxNumberOfProblems": {
+                "type": "number",
+                "default": 100,
+                "description": "Controls the maximum number of problems produced by the server."
+            }
+        }
+    },
+    "dependencies": {
+    },
+    "devDependencies": {
+        "@types/node": "^12.12.0",
+        "@typescript-eslint/eslint-plugin": "^4.23.0",
+        "@typescript-eslint/parser": "^4.23.0",
+        "antlr4ts-cli": "^0.5.0-alpha.4",
+        "eslint": "^7.26.0",
+        "typescript": "^4.4.3"
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "npm run antlr && tsc -b",
+        "antlr": "pushd server && npm run antlr4ts && popd",
+        "watch": "tsc -b -w",
+        "lint": "eslint ./client/src ./server/src --ext .ts",
+        "postinstall": "cd client && yarn && cd ../server && yarn && cd .."
     }
-  },
-  "configuration": {
-    "type": "object",
-    "title": "OSTIS extension configuration",
-    "properties": {
-      "scsLanguageServer.maxNumberOfProblems": {
-        "type": "number",
-        "default": 100,
-        "description": "Controls the maximum number of problems produced by the server."
-      }
-    }
-  },
-  "dependencies": {
-    "antlr4": "^4.7.0",
-    "antlr4ts": "^0.4.1-alpha.0",
-    "pegjs": "^0.10.0",
-    "vscode-languageclient": "^3.2.0",
-    "vscode-languageserver": "^3.2.0"
-  },
-  "devDependencies": {
-    "@types/mocha": "^2.2.32",
-    "@types/node": "^6.0.40",
-    "antlr4ts-cli": "^0.4.0-alpha.4",
-    "cpx": "^1.5.0",
-    "mocha": "^2.3.3",
-    "typescript": "^2.0.3",
-    "vscode": "^1.1.0"
-  },
-  "scripts": {
-    "vscode:prepublish": "antlr4 -Dlanguage=JavaScript src/scs/syntax/scs.g4 && cpx \"src/**/*.js\" out && tsc -p ./",
-    "compile": "antlr4 -Dlanguage=JavaScript src/scs/syntax/scs.g4 && cpx \"src/**/*.js\" out && tsc -watch -p ./",
-    "postinstall": "node ./node_modules/vscode/bin/install",
-    "test": "node ./node_modules/vscode/bin/test"
-  }
 }

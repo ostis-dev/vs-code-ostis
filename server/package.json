@@ -1,0 +1,23 @@
+{
+    "name": "scs-language-server",
+    "description": "",
+    "version": "0.1.0",
+    "author": "OSTIS",
+    "license": "MIT",
+    "engines": {
+        "node": "*"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ostis-dev/vs-code-ostis.git"
+    },
+    "dependencies": {
+        "antlr4ts": "^0.5.0-alpha.4",
+        "save-dev": "^0.0.1-security",
+        "vscode-languageserver": "^7.0.0",
+        "vscode-languageserver-textdocument": "^1.0.2"
+    },
+    "scripts": {
+        "antlr4ts": "antlr4ts -o src/parser -no-listener -no-visitor -Xexact-output-dir src/scs.g4"
+    }
+}
